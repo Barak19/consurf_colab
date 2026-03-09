@@ -1350,8 +1350,6 @@ def ReadMSA(msa):
     return(MSA_Hash, Seq_Names_In_Order)
 
 
-
-
 def create_download_link(file, text):
     callback_id = f"download_{uuid.uuid4().hex}"
 
@@ -1361,11 +1359,9 @@ def create_download_link(file, text):
     output.register_callback(callback_id, download_file)
 
     display(HTML(f'''
-        <br><br><a href="#" onclick="google.colab.kernel.invokeFunction('{callback_id}', [], {{}}); return false;"
-           style="font-size: 16px; text-decoration: none; background: #4CAF50; color: white; 
-                  padding: 10px 15px; border-radius: 5px;">
+        <a href="#" onclick="google.colab.kernel.invokeFunction('{callback_id}', [], {{}}); return false;">
            {text}
-        </a><br><br>
+        </a>
     '''))
     
 
