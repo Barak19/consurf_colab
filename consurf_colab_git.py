@@ -7232,11 +7232,11 @@ def run_consurf(root_dir, git_dir, job_name, mode, substitution_model, rate4site
     print("The calculation is done.")
     LOG.close()
     
-def run_consurf_on_colab(root_dir, job_name, mode, substitution_model, rate4site_algorithm):
+def run_consurf_on_colab(root_dir, git_dir, job_name, mode, substitution_model, rate4site_algorithm):
     
     try:
         
-        run_consurf(root_dir, job_name, mode, substitution_model, rate4site_algorithm)
+        run_consurf(root_dir, git_dir, job_name, mode, substitution_model, rate4site_algorithm)
     
     except Exception as e:
 
