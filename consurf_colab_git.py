@@ -1740,7 +1740,7 @@ def reveal_buried_exposed(buried_exposed):
     G_nl = 2
     G_N = [260, 20, 2]
     
-    weights_file = open("/content/WEIGHTS.BIN", 'r')
+    weights_file = open(vars['git_dir'] + "WEIGHTS.BIN", 'r')
     pnet_file = open("p.net", 'r')
     
 
@@ -7039,7 +7039,7 @@ def get_seqres_atom_seq(PDB_Obj, query_chain, pdb_file_name, model = False):
     return [seqres, atom, atom_without_X]
 
 
-def run_consurf(root_dir, job_name, mode, substitution_model, rate4site_algorithm):
+def run_consurf(root_dir, git_dir, job_name, mode, substitution_model, rate4site_algorithm):
     
     # Use HTML and CSS to style the input box
     display(HTML("""
@@ -7055,6 +7055,7 @@ def run_consurf(root_dir, job_name, mode, substitution_model, rate4site_algorith
     global LOG
 
     vars['root_dir'] = root_dir
+    vars['git_dir'] = git_dir
     #os.chdir(vars['root_dir'])
 
     # check if directory already exists
@@ -7081,8 +7082,11 @@ def run_consurf(root_dir, job_name, mode, substitution_model, rate4site_algorith
     vars['pymol_CBS'] = "pymol_CBS.py"
     
     install()
-    
+    os.chdir(vars['job_name'])
     print("\n")
+
+    shutil.copy(vars['git_dir'] + vars['pymol'], vars['pymol'])
+    shutil.copy(vars['git_dir'] + vars['pymol_CBS'], vars['pymol_CBS'])
 
     choose_mode(mode)
     
