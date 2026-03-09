@@ -73,13 +73,6 @@ def install():
         PROTTEST_EXTRACT.close()
         os.system("touch PROTTEST_READY")
 
-    # install py3dmol
-    if not os.path.isfile("PY3DMOL_READY"):
-    
-        print("Installing py3dmol.")
-        os.system("pip install py3Dmol")
-        os.system("touch PY3DMOL_READY")
-
     # install muscle
     if not os.path.isfile("MUSCLE_READY"):
 
@@ -193,6 +186,13 @@ if not os.path.isfile("FPDF_READY"):
     print("Installing fpdf.")
     os.system("pip install fpdf")
     os.system("touch FPDF_READY")
+    
+# install py3dmol
+if not os.path.isfile("PY3DMOL_READY"):
+    
+    print("Installing py3dmol.")
+    os.system("pip install py3Dmol")
+    os.system("touch PY3DMOL_READY")
 
 from datetime import date
 from datetime import datetime
