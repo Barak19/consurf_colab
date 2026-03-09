@@ -5137,11 +5137,11 @@ def pairwise_alignment(first_seq, second_seq, clustalw_aln = "", seq_type = ""):
 
     if form['DNA_AA'] == "AA":
         
-        aligner.substitution_matrix = substitution_matrices.load("/content/matrix.txt")
+        aligner.substitution_matrix = substitution_matrices.load(vars['git_dir'] + "matrix.txt")
         
     else:
       
-        aligner.substitution_matrix = substitution_matrices.load("/content/matrix-nuc.txt")
+        aligner.substitution_matrix = substitution_matrices.load(vars['git_dir'] + "matrix-nuc.txt")
 
     #Default Gap extension and opening penalties for ClustalW are 0.2 and 10.0.
     aligner.open_gap_score = -5.0 #-10.0
@@ -5218,11 +5218,11 @@ def pairwise_alignment_old(first_seq, second_seq, clustalw_aln = "", seq_type = 
 
     if form['DNA_AA'] == "AA":
         
-        aligner.substitution_matrix = substitution_matrices.load("/content/matrix.txt")
+        aligner.substitution_matrix = substitution_matrices.load(vars['git_dir'] + "matrix.txt")
         
     else:
       
-        aligner.substitution_matrix = substitution_matrices.load("/content/matrix-nuc.txt")
+        aligner.substitution_matrix = substitution_matrices.load(vars['git_dir'] + "matrix-nuc.txt")
 
     #Default Gap extension and opening penalties for ClustalW are 0.2 and 10.0.
     aligner.open_gap_score = -5.0 #-10.0
