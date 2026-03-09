@@ -196,7 +196,6 @@ def install():
 
 from datetime import date
 from datetime import datetime
-from colabfold.batch import get_msa_and_templates
 from Bio import AlignIO
 from Bio import SeqIO
 from Bio import SearchIO
@@ -5822,7 +5821,7 @@ def call_mmseqs2():
     CSV.close()
 
     result_dir = Path(result_dir)
-
+    from colabfold.batch import get_msa_and_templates
     get_msa_and_templates(vars['job_name'], vars['protein_seq_string'], None, result_dir, msa_mode, False, None, pair_mode, pairing_strategy, 'https://api.colabfold.com', 'colabfold/google-colab-main')
 
     os.chdir(vars['working_dir'])
