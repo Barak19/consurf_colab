@@ -79,20 +79,6 @@ def install():
         print("Installing py3dmol.")
         os.system("pip install py3Dmol")
         os.system("touch PY3DMOL_READY")
-    
-    # install biopython
-    if not os.path.isfile("BIOPYTHON_READY"):
-
-        print("Installing biopython.")
-        os.system("pip install biopython")
-        os.system("touch BIOPYTHON_READY")
-
-    # install fpdf
-    if not os.path.isfile("FPDF_READY"):
-
-        print("Installing fpdf.")
-        os.system("pip install fpdf")
-        os.system("touch FPDF_READY")
 
     # install muscle
     if not os.path.isfile("MUSCLE_READY"):
@@ -193,6 +179,20 @@ def install():
         os.system("sed -i 's/weights = jax.nn.softmax(logits)/logits=jnp.clip(logits,-1e8,1e8);weights=jax.nn.softmax(logits)/g' alphafold/model/modules.py")
         os.system("pip install -q biopython==1.81")
         os.system("touch COLABFOLD_READY")
+
+# install biopython
+if not os.path.isfile("BIOPYTHON_READY"):
+
+    print("Installing biopython.")
+    os.system("pip install biopython")
+    os.system("touch BIOPYTHON_READY")
+
+# install fpdf
+if not os.path.isfile("FPDF_READY"):
+
+    print("Installing fpdf.")
+    os.system("pip install fpdf")
+    os.system("touch FPDF_READY")
 
 from datetime import date
 from datetime import datetime
