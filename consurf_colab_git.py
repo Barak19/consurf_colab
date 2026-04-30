@@ -3503,6 +3503,62 @@ def replace_TmpFactor_Consurf_Scores_CIF(atom_grades, query_chain, pdb_file, pre
         print_instructions(pdb_with_grades, "CIF")
 
 
+def add_remark():
+    
+    remark = """REMARK 999
+REMARK 999 This file has been modified by ConSurf. 
+REMARK 999 Publications: https://pubmed.ncbi.nlm.nih.gov/?term=consurf
+REMARK 999 https://consurf.tau.ac.il    https://consurfdb.tau.ac.il 
+REMARK 999 https://colab.research.google.com/drive/1PhDXX7k12oUsV6T_xkXC3Rm9R99e7tHz
+REMARK 999 
+REMARK 999 B-factor/temperature values have been replaced by conservation grades
+REMARK 999 1.0 (variable) to 9.0 (conserved), or 10.0 when the MSA had insufficient
+REMARK 999 data for a reliable grade.
+REMARK 999
+REMARK 999 Chain %s was processed
+""" %(form['PDB_chain'])
+
+    if vars['running_mode'] == "_mode_pdb_no_msa" or vars['running_mode'] == "_mode_no_pdb_no_msa":
+        
+        remark += """REMARK 999 %s E value: %s
+REMARK 999 Maximum sequence identity: %s%%
+REMARK 999 Minimum sequence identity: %s%%
+REMARK 999 Unique sequences found: %s
+REMARK 999 Sequences used in MSA: %s
+REMARK 999 MSA Algorithm: %s
+""" %(form['Homolog_search_algorithm'], form['E_VALUE'], form['MIN_IDENTITY'], vars['hit_redundancy'], vars['unique_seqs'], vars['final_number_of_homologoues'], form['MSAprogram'])
+
+        if form['best_uniform_sequences'] == "best":
+            
+            remark += "REMARK 999 MSA sequences closest to the query were chosen\n"
+            
+        else:
+            
+            remark += "REMARK 999 MSA sequences were Sampled across all unique sequences found\n"
+            
+    if form['ALGORITHM'] == "Bayes":
+        
+        remark += "REMARK 999 Rate4site Algorithm: Bayesian\n"
+        
+    else:
+        
+        remark += "REMARK 999 Rate4site Algorithm: Maximum likelihood\n"
+        
+    if form['SUB_MATRIX'] == "JC_Nuc":
+        
+        substitution_model = "JC"
+        
+    else:
+        
+        substitution_model = form['SUB_MATRIX']
+        
+    remark += """REMARK 999 Substitution model: %s
+REMARK 999 MSA Average Pairwise Distance (APD): %.2f
+REMARK 999 
+""" %(substitution_model, float(vars['Average pairwise distance']))
+            
+    return remark
+
 def replace_TmpFactor_Consurf_Scores_PDB(atom_grades, query_chain, pdb_file, prefix):
 
     # Creates The ATOM section with ConSurf grades instead of the TempFactor column, creates PDB file with ConSurf grades
@@ -3511,6 +3567,9 @@ def replace_TmpFactor_Consurf_Scores_PDB(atom_grades, query_chain, pdb_file, pre
     pdb_with_grades = prefix + "_ATOMS_section_With_ConSurf.pdb"
     pdb_with_grades_isd = prefix + "_ATOMS_section_With_ConSurf_isd.pdb"
     pdb_with_scores = prefix + "_With_Conservation_Scores.pdb"
+
+    remark_added = False
+    remark_found = False
 
     try:
 
@@ -3557,6 +3616,17 @@ def replace_TmpFactor_Consurf_Scores_PDB(atom_grades, query_chain, pdb_file, pre
 			
         if line[:4] == "ATOM" or line[:6] == "HETATM":
 
+            if not remark_added:
+                        
+                remark = add_remark()
+                GRADES.write(remark)
+                SCORES.write(remark)
+                if vars['insufficient_data']:
+
+                    GRADES_ISD.write(remark)
+                            
+                remark_added = True
+                        
             chain = line[21:22]
             if chain == " ":
 			
@@ -3569,9 +3639,13 @@ def replace_TmpFactor_Consurf_Scores_PDB(atom_grades, query_chain, pdb_file, pre
                 while len(score) < 6:
 
                     score = " " + score
+                    
+                while len(grade) < 6:
+                    
+                    grade = " " + grade
 					
                 # the TF is updated with the grades and scores
-                GRADES.write(line[:60] + "     " + grade + "      \n")
+                GRADES.write(line[:60] + grade + line[66:])
                 SCORES.write(line[:60] + score + line[66:])
 
                 if vars['insufficient_data']:
@@ -3579,22 +3653,73 @@ def replace_TmpFactor_Consurf_Scores_PDB(atom_grades, query_chain, pdb_file, pre
                     # the TF is updated with the number from gradesPE showing isd
                     if isd == 1:
 					
-                        GRADES_ISD.write(line[:60] + "    10      \n")
+                        white_space = " " * 4
+                        GRADES_ISD.write(line[:60] + white_space + "10" + line[66:])
 						
                     else:
 					
-                        GRADES_ISD.write(line[:60] + "    " + grade + "      \n")
+                        GRADES_ISD.write(line[:60] + grade + line[66:])
 
             else:
 			
-                GRADES.write(line[:60] + "            \n")
-                SCORES.write(line[:60] + "            \n")
+                white_space = " " * 6
+                GRADES.write(line[:60] + white_space + line[66:])
+                SCORES.write(line[:60] + white_space + line[66:])
                 if vars['insufficient_data']:
 
-                    GRADES_ISD.write(line[:60] + "            \n")
+                    GRADES_ISD.write(line[:60] + white_space + line[66:])
 
         else:
 
+            if not remark_added:
+                
+                if line.startswith("REMARK"):
+                    
+                    remark_found = True
+                    
+                elif remark_found:
+                                                
+                    remark = add_remark()
+                    GRADES.write(remark)
+                    SCORES.write(remark)
+                    if vars['insufficient_data']:
+    
+                        GRADES_ISD.write(remark)
+                                
+                    remark_added = True    
+                    
+                else:
+                    
+                    for field in ["DBREF", 
+                                  "SEQADV", 
+                                  "SEQRES", 
+                                  "MODRES", 
+                                  "HET", 
+                                  "HETNAM", 
+                                  "HETSYN", 
+                                  "FORMUL",
+                                  "HELIX",
+                                  "SHEET",
+                                  "SSBOND",
+                                  "LINK",
+                                  "CISPEP",
+                                  "SITE",
+                                  "CRYST1",
+                                  "ORIGX",
+                                  "SCALE",
+                                  "MTRIX"]:
+                    
+                        if line.startswith(field):
+                            
+                            remark = add_remark()
+                            GRADES.write(remark)
+                            SCORES.write(remark)
+                            if vars['insufficient_data']:
+    
+                                GRADES_ISD.write(remark)
+                                
+                            remark_added = True
+                        
             GRADES.write(line)
             SCORES.write(line)
             if vars['insufficient_data']:
@@ -3605,6 +3730,8 @@ def replace_TmpFactor_Consurf_Scores_PDB(atom_grades, query_chain, pdb_file, pre
 
     GRADES.close()
     SCORES.close()	
+	
+
     vars['zip_list'].append(pdb_with_grades)
     vars['zip_list'].append(pdb_with_scores)
     if vars['insufficient_data']:
@@ -3616,6 +3743,7 @@ def replace_TmpFactor_Consurf_Scores_PDB(atom_grades, query_chain, pdb_file, pre
         
         show_py3dmol(pdb_with_grades, "pdb")
         print_instructions(pdb_with_grades, "PDB")
+
 
 def design_string_with_spaces_for_pipe(part_input):
 
